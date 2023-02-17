@@ -1,0 +1,7 @@
+mqtt:
+  automaticReconnect: true
+  cleanSession: true
+  connectionTimeout: 5000
+  clientId: SCORBOT-CONTROLLER
+  hostname: localhost
+  port: 1883
