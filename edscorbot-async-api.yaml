@@ -203,7 +203,31 @@ channels:
               $ref: '#/components/schemas/point'
             timestamp:
               $ref: '#/components/schemas/sentAt'
-  
+  'cancelTrajectory':
+    description: Channel/topic provided to allow arm's owner (CLIENTS) to cancel theirs trajectory execution before finishing it. 
+    publish:
+      summary: CLIENTS are publishers
+      operationId: cancelTrajectoryPub
+      message:
+        payload:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/client'
+            timestamp:
+              $ref: '#/components/schemas/sentAt'
+    subscribe:
+      summary: CONTROLLER is subscriber
+      operationId: cancelTrajectoryRec
+      message:
+        payload:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/client'
+            timestamp:
+              $ref: '#/components/schemas/sentAt'
+              
 components:
   schemas:
     client:

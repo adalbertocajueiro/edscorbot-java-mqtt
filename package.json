@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@asyncapi/generator": "^1.9.17",
+    "@asyncapi/html-template": "^0.28.3"
+  }
+}
