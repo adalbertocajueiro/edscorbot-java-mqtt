@@ -27,6 +27,8 @@ info:
 
     * CLIENT = Any application that wants to interact with the arm. In our case, this application is an Angular front-end to provide a friendly user experience to the final user (human).
 
+    * We use a style where the information flows in channels from providers to subscribers.
+
 
   termsOfService: https://asyncapi.org/terms/
   contact:
@@ -67,10 +69,22 @@ channels:
     publish:
       summary: CONTROLLER is publisher
       operationId: statusPub
+      message:
+        payload:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/status'
 
     subscribe:
       summary: CLIENTS are subscribers 
       operationId: statusRec
+      message:
+        payload:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/status'
      
   'connect':
     description: Channel/topic provided to CLIENTS use to connect to the arm, so they can become owners. If the arm is available, the controller promotes on client to `owner` and notifies all clients about it. 
@@ -104,8 +118,6 @@ channels:
           properties:
             user:
               $ref: '#/components/schemas/client'
-          timestamp:
-              $ref: '#/components/schemas/sentAt'
     subscribe:
       summary: CLIENTS are subscribers
       operationId: connectedRec
@@ -115,8 +127,6 @@ channels:
           properties:
             user:
               $ref: '#/components/schemas/client'
-            timestamp:
-              $ref: '#/components/schemas/sentAt'
   
   'disconnect':
     description: Channel/topic provided to allow arm's owner (CLIENT) to `release` the arm. 
@@ -129,22 +139,16 @@ channels:
           properties:
             user:
               $ref: '#/components/schemas/client'
-            timestamp:
-              $ref: '#/components/schemas/sentAt'
   
     subscribe:
       summary: CONTROLLER is subscriber
       operationId: disconnectRec
-      # traits:
-      #  - $ref: '#/components/operationTraits/kafka'
       message:
         payload:
           type: object
           properties:
             user:
               $ref: '#/components/schemas/client'
-            timestamp:
-              $ref: '#/components/schemas/sentAt'
   
   'trajectory':
     description: Channel/topic provided to allow arm's owner (CLIENTS) to send a trajectory to the controller. A trajectory is a sequence of points and its execution respects the order of the points. Each point represents a single movement to be executed by the robot. 
@@ -159,8 +163,6 @@ channels:
               $ref: '#/components/schemas/client'
             trajectory:
               $ref: '#/components/schemas/trajectory'
-            timestamp:
-              $ref: '#/components/schemas/sentAt'
     subscribe:
       summary: CONTROLLER is subscriber
       operationId: trajectoryRec
@@ -172,8 +174,6 @@ channels:
               $ref: '#/components/schemas/client'
             trajectory:
               $ref: '#/components/schemas/trajectory'
-            timestamp:
-              $ref: '#/components/schemas/sentAt'
 
   'point':
     description: Channel/topic provided to allow the CONTROLLER to publish the last point of the arm. The controller is supposed to publish this point each time the arm is moved. Therefore, it does not matter if the controller has moved the arm to the home position of is executing an entire trajectory.  
@@ -188,8 +188,6 @@ channels:
               $ref: '#/components/schemas/client'
             point:
               $ref: '#/components/schemas/point'
-            timestamp:
-              $ref: '#/components/schemas/sentAt'
     subscribe:
       summary: CLIENTS are subscribers
       operationId: trajectoryPointRec
@@ -201,8 +199,6 @@ channels:
               $ref: '#/components/schemas/client'
             point:
               $ref: '#/components/schemas/point'
-            timestamp:
-              $ref: '#/components/schemas/sentAt'
   'cancelTrajectory':
     description: Channel/topic provided to allow arm's owner (CLIENTS) to cancel theirs trajectory execution before finishing it. 
     publish:
@@ -214,8 +210,6 @@ channels:
           properties:
             user:
               $ref: '#/components/schemas/client'
-            timestamp:
-              $ref: '#/components/schemas/sentAt'
     subscribe:
       summary: CONTROLLER is subscriber
       operationId: cancelTrajectoryRec
@@ -225,9 +219,6 @@ channels:
           properties:
             user:
               $ref: '#/components/schemas/client'
-            timestamp:
-              $ref: '#/components/schemas/sentAt'
-              
 components:
   schemas:
     client:
@@ -260,12 +251,7 @@ components:
       description: A array of points to be applied to the arm.
       items:
         $ref: '#/components/schemas/point'
-           
-    sentAt:
-      type: string
-      format: date-time
-      description: Date and time when the message was sent.
-    
+          
     status:
       type: string
       description: The status of the controller (and of the arm) to clients
