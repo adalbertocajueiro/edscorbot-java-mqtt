@@ -34,11 +34,11 @@ public class MqttService {
     private IMqttClient mqttClientPublisher;
 
     private Set<String> topicsSubscriber = new HashSet<String>(
-            Arrays.asList(  Constants.CHECK_STATUS,Constants.CONNECT,
-                            Constants.DISCONNECT,Constants.TRAJECTORY, 
-                            Constants.CANCEL_TRAJECTORY));
+            Arrays.asList(Constants.CHECK_STATUS, Constants.CONNECT,
+                    Constants.DISCONNECT, Constants.TRAJECTORY,
+                    Constants.CANCEL_TRAJECTORY));
 
-    public MqttService() throws MqttException, InterruptedException{
+    public MqttService() throws MqttException, InterruptedException {
         this.status = ArmStatus.FREE;
         System.out.println("Creating MQTT client for subscriptions...");
         this.mqttClientSubscriber = new MqttClient("tcp://" + Constants.hostname + ":" + Constants.port,
@@ -49,7 +49,6 @@ public class MqttService {
         options.setCleanSession(true);
         options.setConnectionTimeout(5000);
 
-        
         this.mqttClientSubscriber.connect(options);
         System.out.println("Subscribing SCORBOT CONTROLLER in all topics...");
         this.subscribeAllTopics();
@@ -64,7 +63,7 @@ public class MqttService {
 
     private void subscribeAllTopics() throws MqttException, InterruptedException {
         String[] topicFilters = this.topicsSubscriber.toArray(new String[0]);
-        int[] qos = {0,0,0,0,0}; 
+        int[] qos = { 0, 0, 0, 0, 0 };
         mqttClientSubscriber.setCallback(new MqttCallback() {
 
             @Override
@@ -81,68 +80,70 @@ public class MqttService {
             public void deliveryComplete(IMqttDeliveryToken token) {
                 // TODO Auto-generated method stub
             }
-            
+
         });
-        
-        mqttClientSubscriber.subscribe(topicFilters,qos);
+
+        mqttClientSubscriber.subscribe(topicFilters, qos);
         System.out.println("    subscribed on topics " + this.topicsSubscriber);
     }
 
     public void publish(String topic, Object payload, int qos, boolean retained)
             throws MqttPersistenceException, MqttException, InterruptedException {
-        
-                Gson gson = new Gson();
+
+        Gson gson = new Gson();
         MqttMessage mqttMessage = new MqttMessage();
         mqttMessage.setPayload(gson.toJson(payload).getBytes());
         mqttMessage.setQos(qos);
         mqttMessage.setRetained(retained);
-        
+
         mqttClientPublisher.publish(topic, mqttMessage);
     }
 
-    private void handleResponse(String topic, MqttMessage message) throws MqttPersistenceException, MqttException, InterruptedException{
+    private void handleResponse(String topic, MqttMessage message)
+            throws MqttPersistenceException, MqttException, InterruptedException {
         Gson gson = new Gson();
         String content = message.toString();
         Owner owner = null;
-        //this handler is invoked only when the controller receives a message (as consumer)
-        switch(topic){
+        // this handler is invoked only when the controller receives a message (as
+        // consumer)
+        switch (topic) {
             case Constants.CHECK_STATUS:
                 System.out.println("Client wants to check status of the arm and it is: " + this.status);
                 this.publish(Constants.STATUS, this.status, 0, false);
                 break;
             case Constants.CONNECT:
-                try{
-                    owner =  gson.fromJson(content, Owner.class);
+                try {
+                    owner = gson.fromJson(content, Owner.class);
                     System.out.print("Client wants to connect to the arm: " + owner.getId());
-                    if(this.owner == null){
+                    if (this.owner == null) {
                         this.owner = owner;
                         this.status = ArmStatus.BUSY;
                         this.publish(Constants.CONNECTED, owner, 0, false);
                         System.out.println(" ==> CONNECTED");
-                    } else{
+                    } else {
                         this.publish(Constants.STATUS, this.status, 0, false);
                     }
-                }catch(JsonSyntaxException ex){
+                } catch (JsonSyntaxException ex) {
                     System.out.println("OWNER NOT CAPTURED FROM MESSAGE");
                 }
                 break;
             case Constants.DISCONNECT:
                 try {
-                    owner =  gson.fromJson(content, Owner.class);
+                    owner = gson.fromJson(content, Owner.class);
                     System.out.println("Client wants to disconnect from the arm: " + owner.getId());
                     if (this.owner != null) {
-                        if(this.owner.getId().equals(owner.getId())){
-                            //this.publish(Constants.DISCONNECTED, owner, 0, false);
+                        if (this.owner.getId().equals(owner.getId())) {
+                            // this.publish(Constants.DISCONNECTED, owner, 0, false);
                             this.owner = null;
                             this.status = ArmStatus.FREE;
                             this.publish(Constants.STATUS, this.status, 0, false);
-                        }                        
-                    } 
-                    
+                        }
+                    }
+
                 } catch (JsonSyntaxException ex) {
                     System.out.println("OWNER NOT CAPTURED FROM MESSAGE");
                 }
-                
+
                 break;
             case Constants.TRAJECTORY:
                 Trajectory trajectory = null;
@@ -150,14 +151,15 @@ public class MqttService {
                     trajectory = gson.fromJson(content, Trajectory.class);
                     System.out.println("Client wants to execute trajectory: " + trajectory.getOwner().getId());
                     if (this.owner != null) {
-                        if(this.owner.getId().equals(trajectory.getOwner().getId())){
+                        if (this.owner.getId().equals(trajectory.getOwner().getId())) {
                             Iterator<Point> it = trajectory.getPoints().iterator();
-                            while(it.hasNext()){
+                            while (it.hasNext()) {
                                 Point next = it.next();
                                 System.out.println("  -> Arm moved to point " + next);
+                                Thread.sleep(1000);
                                 this.publish(Constants.POINT, next, 0, false);
                             }
-                        }    
+                        }
                     } else {
                         this.publish(Constants.STATUS, this.status, 0, false);
                     }
@@ -172,13 +174,13 @@ public class MqttService {
                     System.out.println("Client wants requested to cancel the trajectory: " + owner.getId());
                     if (this.owner != null) {
                         if (this.owner.getId().equals(owner.getId())) {
-                            //stops the arm and moves it to home
+                            // stops the arm and moves it to home
                             System.out.println("  -> Arm moved to home ");
-                            Point home = new Point(0,0,0,0);
+                            Point home = new Point(0, 0, 0, 0);
                             this.publish(Constants.POINT, home, 0, false);
                         }
                     } else {
-                        //the requesting user is not the owner
+                        // the requesting user is not the owner
                     }
 
                 } catch (JsonSyntaxException ex) {
