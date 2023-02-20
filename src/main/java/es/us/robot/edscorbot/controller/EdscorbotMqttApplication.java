@@ -1,11 +1,11 @@
-package es.us.score.edscorbot.controller;
+package es.us.robot.edscorbot.controller;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import es.us.score.edscorbot.service.MqttService;
+import es.us.robot.edscorbot.service.MqttService;
 
 @SpringBootApplication
 public class EdscorbotMqttApplication implements CommandLineRunner {

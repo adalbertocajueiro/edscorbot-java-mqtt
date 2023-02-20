@@ -1,4 +1,4 @@
-package es.us.score.edscorbot.util;
+package es.us.robot.edscorbot.models;
 
 import lombok.Getter;
 import lombok.Setter;

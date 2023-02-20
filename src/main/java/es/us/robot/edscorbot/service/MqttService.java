@@ -1,4 +1,4 @@
-package es.us.score.edscorbot.service;
+package es.us.robot.edscorbot.service;
 
 import java.util.Set;
 import java.util.Arrays;
@@ -18,11 +18,11 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import es.us.score.edscorbot.util.Constants;
-import es.us.score.edscorbot.util.ArmStatus;
-import es.us.score.edscorbot.util.Owner;
-import es.us.score.edscorbot.util.Trajectory;
-import es.us.score.edscorbot.util.Point;
+import es.us.robot.edscorbot.models.Owner;
+import es.us.robot.edscorbot.models.Point;
+import es.us.robot.edscorbot.models.Trajectory;
+import es.us.robot.edscorbot.util.ArmStatus;
+import es.us.robot.edscorbot.util.Constants;
 
 @Service
 public class MqttService {

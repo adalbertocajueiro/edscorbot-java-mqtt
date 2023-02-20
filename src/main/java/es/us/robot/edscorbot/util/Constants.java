@@ -1,8 +1,12 @@
-package es.us.score.edscorbot.util;
+package es.us.robot.edscorbot.util;
 
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
+
+import es.us.robot.edscorbot.models.Owner;
+import es.us.robot.edscorbot.models.Point;
+import es.us.robot.edscorbot.models.Trajectory;
 
 @Component
 public class Constants {

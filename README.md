@@ -17,9 +17,10 @@ This project has been developed using the following tools:
 * Download de project and unzip it
 * Open the project in Visual Studio Code (vscode). It might be possible vscode offers other extensions to be installed. Just accept it.
 * Folder `docs` contains the generated HTML documentation of EDScorbot Controller (AsyncAPI)
-* (Optional) If you want to install the AsyncAPI generator globally run `sudo npm install -g @asyncapi/cli`  `OR` if you want to install only in this project run `npm install @asyncapi/generator`
-* (Optional) The documentation generator requires a template to format its output. To install the most common template (HTML) run `npm install @asyncapi/html-template`
-* The file `edscorbot-async-api.yaml` contains a valid specification of its AsyncAPI. If you want to generate its documentation in `docs` folder run `asyncapi generate fromTemplate edscorbot-async-api.yaml @asyncapi/html-template -o docs`  
+* (Step 1 - optional) If you want to install the AsyncAPI generator globally run `sudo npm install -g @asyncapi/cli`  `OR` if you want to install only in this project run `npm install @asyncapi/generator`
+* (Step 2 - optional) The documentation generator requires a template to format its output. To install the most common template (HTML) run `npm install @asyncapi/html-template`
+* Steps 1 and 2 install the necessary dependencies to re-generate the documentation and need to run only at once. As the project has already a package.json file containing the names of all dependencies to generate documentation, you can also just run `npm install` and the above dependencies will be installed.
+* (Step 3 - optional) The file `edscorbot-async-api.yaml` contains a valid specification of its AsyncAPI. If you want to generate its documentation in `docs` folder run `asyncapi generate fromTemplate edscorbot-async-api.yaml @asyncapi/html-template -o docs`  
 * For more information about customizing doc generation please refer to (https://www.asyncapi.com/docs/tools/generator/usage)
 * Start you Mosquitto Broker in localhost and port 1883. Open a terminal and start mosquitto. Normally this is achieved by running the command `mosquitto`. The terminal remains watching the broker execution
 * Run the class EdscorbotMqttApplication.java and the server should start. This step is more user friendly if executed from the vscode editor, as it presents options for Run and Debug above the `main` method.

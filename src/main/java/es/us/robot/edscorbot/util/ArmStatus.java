@@ -1,4 +1,4 @@
-package es.us.score.edscorbot.util;
+package es.us.robot.edscorbot.util;
 
 public enum ArmStatus {
     FREE,
