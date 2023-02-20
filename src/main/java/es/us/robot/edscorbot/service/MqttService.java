@@ -34,7 +34,9 @@ public class MqttService {
     private IMqttClient mqttClientPublisher;
 
     private Set<String> topicsSubscriber = new HashSet<String>(
-            Arrays.asList(Constants.CHECK_STATUS,Constants.CONNECT,Constants.DISCONNECT,Constants.TRAJECTORY));
+            Arrays.asList(  Constants.CHECK_STATUS,Constants.CONNECT,
+                            Constants.DISCONNECT,Constants.TRAJECTORY, 
+                            Constants.CANCEL_TRAJECTORY));
 
     public MqttService() throws MqttException, InterruptedException{
         this.status = ArmStatus.FREE;
@@ -62,7 +64,7 @@ public class MqttService {
 
     private void subscribeAllTopics() throws MqttException, InterruptedException {
         String[] topicFilters = this.topicsSubscriber.toArray(new String[0]);
-        int[] qos = {0,0,0,0}; 
+        int[] qos = {0,0,0,0,0}; 
         mqttClientSubscriber.setCallback(new MqttCallback() {
 
             @Override
@@ -162,6 +164,25 @@ public class MqttService {
 
                 } catch (JsonSyntaxException ex) {
                     System.out.println("TRAJECTORY NOT CAPTURED FROM MESSAGE");
+                }
+                break;
+            case Constants.CANCEL_TRAJECTORY:
+                try {
+                    owner = gson.fromJson(content, Owner.class);
+                    System.out.println("Client wants requested to cancel the trajectory: " + owner.getId());
+                    if (this.owner != null) {
+                        if (this.owner.getId().equals(owner.getId())) {
+                            //stops the arm and moves it to home
+                            System.out.println("  -> Arm moved to home ");
+                            Point home = new Point(0,0,0,0);
+                            this.publish(Constants.POINT, home, 0, false);
+                        }
+                    } else {
+                        //the requesting user is not the owner
+                    }
+
+                } catch (JsonSyntaxException ex) {
+                    System.out.println("OWNER NOT CAPTURED FROM MESSAGE");
                 }
                 break;
             default:

@@ -2,12 +2,6 @@ package es.us.robot.edscorbot.util;
 
 import org.springframework.stereotype.Component;
 
-import com.google.gson.Gson;
-
-import es.us.robot.edscorbot.models.Owner;
-import es.us.robot.edscorbot.models.Point;
-import es.us.robot.edscorbot.models.Trajectory;
-
 @Component
 public class Constants {
 
@@ -30,12 +24,16 @@ public class Constants {
     public static final String CONNECT = "armConnect";
     public static final String DISCONNECT = "armDisconnect";
     public static final String TRAJECTORY = "trajectory";
+    public static final String CANCEL_TRAJECTORY = "cancelTrajectory";
 
     // publisher topics
     public static final String STATUS = "armStatus";
     public static final String CONNECTED = "armConnected";
     public static final String POINT = "point";
     
+    /**
+     * 
+     * 
     public static void main(String[] args) {
 
         Trajectory traj = new Trajectory();
@@ -50,4 +48,5 @@ public class Constants {
         traj = gson.fromJson(trajStr, Trajectory.class);
         System.out.println(trajectory);
     }
+    */
 }
