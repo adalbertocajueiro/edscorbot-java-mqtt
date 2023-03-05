@@ -1,8 +1,8 @@
 package es.us.robot.edscorbot.util;
 
-public enum ArmMetaInfo{
-    GET_METAINFO (1),
-    METAINFO (2);
+public enum ArmMetaInfo {
+    ARM_GET_METAINFO(1),
+    ARM_METAINFO(2);
 
     private final int number;
 

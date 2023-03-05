@@ -64,7 +64,7 @@ public class MqttService {
     private void subscribeAllTopics() throws MqttException, InterruptedException {
         String[] topicFilters = this.topicsSubscriber.toArray(new String[0]);
         int[] qos = new int[this.topicsSubscriber.size()];
-        
+
         mqttClientSubscriber.setCallback(new MqttCallback() {
 
             @Override
@@ -156,17 +156,18 @@ public class MqttService {
                 Trajectory trajectory = null;
                 try {
                     trajectory = gson.fromJson(content, Trajectory.class);
-                    //System.out.println("Client wants to execute trajectory: " + trajectory.getOwner().getId());
+                    // System.out.println("Client wants to execute trajectory: " +
+                    // trajectory.getOwner().getId());
                     if (this.owner != null) {
-                        //if (this.owner.getId().equals(trajectory.getOwner().getId())) {
-                            Iterator<Point> it = trajectory.getPoints().iterator();
-                            while (it.hasNext()) {
-                                Point next = it.next();
-                                System.out.println("  -> Arm moved to point " + next);
-                                Thread.sleep(1000);
-                                this.publish(Constants.POINT, next, 0, false);
-                            }
-                        //}
+                        // if (this.owner.getId().equals(trajectory.getOwner().getId())) {
+                        Iterator<Point> it = trajectory.getPoints().iterator();
+                        while (it.hasNext()) {
+                            Point next = it.next();
+                            System.out.println("  -> Arm moved to point " + next);
+                            Thread.sleep(1000);
+                            this.publish(Constants.POINT, next, 0, false);
+                        }
+                        // }
                     } else {
                         this.publish(Constants.STATUS, this.status, 0, false);
                     }
@@ -183,8 +184,8 @@ public class MqttService {
                         if (this.owner.getId().equals(owner.getId())) {
                             // stops the arm and moves it to home
                             System.out.println("  -> Arm moved to home ");
-                            //Point home = new Point(0, 0, 0, 0);
-                            //this.publish(Constants.POINT, home, 0, false);
+                            // Point home = new Point(0, 0, 0, 0);
+                            // this.publish(Constants.POINT, home, 0, false);
                         }
                     } else {
                         // the requesting user is not the owner
@@ -200,21 +201,21 @@ public class MqttService {
     }
 
     private void handleMetaInfo(MqttMessage message)
-            throws MqttPersistenceException, MqttException, InterruptedException{
+            throws MqttPersistenceException, MqttException, InterruptedException {
 
         Gson gson = new Gson();
         String content = message.toString();
         MetaInfoObject input = gson.fromJson(content, MetaInfoObject.class);
-        
+
         ArmMetaInfo option = input.getOption();
 
-        if(option.equals(ArmMetaInfo.GET_METAINFO)){ //client has sent this message
+        if (option.equals(ArmMetaInfo.ARM_GET_METAINFO)) { // client has sent this message
             MetaInfoObject output = new MetaInfoObject();
             output.setName(Constants.controllerName);
             output.setJoints(Constants.joints);
-            output.setOption(ArmMetaInfo.METAINFO);
+            output.setOption(ArmMetaInfo.ARM_METAINFO);
             this.publish(Constants.META_INFO, output, 0, false);
-        } 
+        }
         // in the other case the controller has sent this message and ignores it
     }
 }

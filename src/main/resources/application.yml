@@ -1,0 +1,3 @@
+controller:
+    name: "EDScorbot"
+    joints: 6

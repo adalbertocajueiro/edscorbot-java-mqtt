@@ -12,13 +12,12 @@ public class Constants {
     public static final String controllerName = "EDScorbot";
 
     public static final List<JointInfo> joints = Arrays.asList(
-        new JointInfo(-450, 500), 
-        new JointInfo(-950, 800), 
-        new JointInfo(-350, 350),
-        new JointInfo(-1500, 1600),
-        new JointInfo(0,0),
-        new JointInfo(0,0)
-    );
+            new JointInfo(-450, 500),
+            new JointInfo(-950, 800),
+            new JointInfo(-350, 350),
+            new JointInfo(-1500, 1600),
+            new JointInfo(0, 0),
+            new JointInfo(0, 0));
 
     public static final boolean automaticReconnect = true;
 
@@ -53,7 +52,7 @@ public class Constants {
     public static void main(String[] args) {
 
         MetaInfoObject obj = new MetaInfoObject();
-        obj.setOption(ArmMetaInfo.GET_METAINFO);
+        obj.setOption(ArmMetaInfo.ARM_GET_METAINFO);
         Gson gson = new Gson();
         String objStr = gson.toJson(obj);
         System.out.println(objStr);
