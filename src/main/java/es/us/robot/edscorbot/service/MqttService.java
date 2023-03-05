@@ -121,6 +121,7 @@ public class MqttService {
                         this.publish(Constants.CONNECTED, owner, 0, false);
                         System.out.println(" ==> CONNECTED");
                     } else {
+                        this.publish(Constants.CONNECTED, owner, 0, false);
                         this.publish(Constants.STATUS, this.status, 0, false);
                     }
                 } catch (JsonSyntaxException ex) {
