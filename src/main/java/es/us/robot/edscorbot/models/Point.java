@@ -1,5 +1,9 @@
 package es.us.robot.edscorbot.models;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,20 +12,20 @@ import lombok.Setter;
 @Setter
 public class Point{
 
-    private double j1Ref;
-    private double j2Ref;
-    private double j3Ref;
-    private double j4Ref;
+    private List<Double> coordinates;
+
     public Point() {
+        this.coordinates = new ArrayList<Double>();
     }
-    public Point(double j1Ref, double j2Ref, double j3Ref, double j4Ref) {
-        this.j1Ref = j1Ref;
-        this.j2Ref = j2Ref;
-        this.j3Ref = j3Ref;
-        this.j4Ref = j4Ref;
+
+    public Point(List<Double> coordinates) {
+        this.coordinates = coordinates;
     }
+
     @Override
     public String toString() {
-        return String.format("(%s,%s,%s,%s)", j1Ref, j2Ref, j3Ref, j4Ref);
+        return Arrays.toString(this.coordinates.toArray());
     }
+
+    
 }

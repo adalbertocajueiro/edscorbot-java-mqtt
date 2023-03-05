@@ -5,15 +5,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Owner {
+public class Client {
 
     private String id;
 
-    public Owner(String id) {
+    public Client(String id) {
         this.id = id;
     }
 
-    public Owner() {
+    public Client() {
     }
 
 }

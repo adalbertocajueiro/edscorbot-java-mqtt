@@ -10,7 +10,7 @@ import es.us.robot.edscorbot.service.MqttService;
 @SpringBootApplication
 public class EdscorbotMqttApplication implements CommandLineRunner {
 
-	public EdscorbotMqttApplication() throws MqttException, InterruptedException{
+	public EdscorbotMqttApplication() throws MqttException, InterruptedException {
 		new MqttService();
 	}
 
@@ -23,7 +23,7 @@ public class EdscorbotMqttApplication implements CommandLineRunner {
 
 		boolean SERVER_UP = true;
 
-		while (SERVER_UP){
+		while (SERVER_UP) {
 			;
 		}
 	}

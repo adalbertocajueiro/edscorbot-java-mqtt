@@ -18,25 +18,25 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import es.us.robot.edscorbot.models.Owner;
+import es.us.robot.edscorbot.models.Client;
 import es.us.robot.edscorbot.models.Point;
 import es.us.robot.edscorbot.models.Trajectory;
+import es.us.robot.edscorbot.models.MetaInfoObject;
 import es.us.robot.edscorbot.util.ArmStatus;
 import es.us.robot.edscorbot.util.Constants;
+import es.us.robot.edscorbot.util.ArmMetaInfo;
 
 @Service
 public class MqttService {
 
     private ArmStatus status;
-    private Owner owner;
+    private Client owner;
 
     private IMqttClient mqttClientSubscriber;
     private IMqttClient mqttClientPublisher;
 
     private Set<String> topicsSubscriber = new HashSet<String>(
-            Arrays.asList(Constants.CHECK_STATUS, Constants.CONNECT,
-                    Constants.DISCONNECT, Constants.TRAJECTORY,
-                    Constants.CANCEL_TRAJECTORY));
+            Arrays.asList(Constants.META_INFO, Constants.COMMANDS));
 
     public MqttService() throws MqttException, InterruptedException {
         this.status = ArmStatus.FREE;
@@ -63,7 +63,8 @@ public class MqttService {
 
     private void subscribeAllTopics() throws MqttException, InterruptedException {
         String[] topicFilters = this.topicsSubscriber.toArray(new String[0]);
-        int[] qos = { 0, 0, 0, 0, 0 };
+        int[] qos = new int[this.topicsSubscriber.size()];
+        
         mqttClientSubscriber.setCallback(new MqttCallback() {
 
             @Override
@@ -103,17 +104,22 @@ public class MqttService {
             throws MqttPersistenceException, MqttException, InterruptedException {
         Gson gson = new Gson();
         String content = message.toString();
-        Owner owner = null;
+        Client owner = null;
         // this handler is invoked only when the controller receives a message (as
         // consumer)
         switch (topic) {
-            case Constants.CHECK_STATUS:
-                System.out.println("Client wants to check status of the arm and it is: " + this.status);
+            case Constants.META_INFO:
+                System.out.println("Message in channel metainfo. Handling...");
+                this.handleMetaInfo(message);
+                break;
+            case Constants.COMMANDS:
+                System.out.println("Message in channel commands. Handling...");
+                // this.handle command(message)
                 this.publish(Constants.STATUS, this.status, 0, false);
                 break;
             case Constants.CONNECT:
                 try {
-                    owner = gson.fromJson(content, Owner.class);
+                    owner = gson.fromJson(content, Client.class);
                     System.out.print("Client wants to connect to the arm: " + owner.getId());
                     if (this.owner == null) {
                         this.owner = owner;
@@ -130,7 +136,7 @@ public class MqttService {
                 break;
             case Constants.DISCONNECT:
                 try {
-                    owner = gson.fromJson(content, Owner.class);
+                    owner = gson.fromJson(content, Client.class);
                     System.out.println("Client wants to disconnect from the arm: " + owner.getId());
                     if (this.owner != null) {
                         if (this.owner.getId().equals(owner.getId())) {
@@ -150,9 +156,9 @@ public class MqttService {
                 Trajectory trajectory = null;
                 try {
                     trajectory = gson.fromJson(content, Trajectory.class);
-                    System.out.println("Client wants to execute trajectory: " + trajectory.getOwner().getId());
+                    //System.out.println("Client wants to execute trajectory: " + trajectory.getOwner().getId());
                     if (this.owner != null) {
-                        if (this.owner.getId().equals(trajectory.getOwner().getId())) {
+                        //if (this.owner.getId().equals(trajectory.getOwner().getId())) {
                             Iterator<Point> it = trajectory.getPoints().iterator();
                             while (it.hasNext()) {
                                 Point next = it.next();
@@ -160,7 +166,7 @@ public class MqttService {
                                 Thread.sleep(1000);
                                 this.publish(Constants.POINT, next, 0, false);
                             }
-                        }
+                        //}
                     } else {
                         this.publish(Constants.STATUS, this.status, 0, false);
                     }
@@ -171,14 +177,14 @@ public class MqttService {
                 break;
             case Constants.CANCEL_TRAJECTORY:
                 try {
-                    owner = gson.fromJson(content, Owner.class);
+                    owner = gson.fromJson(content, Client.class);
                     System.out.println("Client wants requested to cancel the trajectory: " + owner.getId());
                     if (this.owner != null) {
                         if (this.owner.getId().equals(owner.getId())) {
                             // stops the arm and moves it to home
                             System.out.println("  -> Arm moved to home ");
-                            Point home = new Point(0, 0, 0, 0);
-                            this.publish(Constants.POINT, home, 0, false);
+                            //Point home = new Point(0, 0, 0, 0);
+                            //this.publish(Constants.POINT, home, 0, false);
                         }
                     } else {
                         // the requesting user is not the owner
@@ -191,5 +197,24 @@ public class MqttService {
             default:
                 System.out.println("Topic not recognized!");
         }
+    }
+
+    private void handleMetaInfo(MqttMessage message)
+            throws MqttPersistenceException, MqttException, InterruptedException{
+
+        Gson gson = new Gson();
+        String content = message.toString();
+        MetaInfoObject input = gson.fromJson(content, MetaInfoObject.class);
+        
+        ArmMetaInfo option = input.getOption();
+
+        if(option.equals(ArmMetaInfo.GET_METAINFO)){ //client has sent this message
+            MetaInfoObject output = new MetaInfoObject();
+            output.setName(Constants.controllerName);
+            output.setJoints(Constants.joints);
+            output.setOption(ArmMetaInfo.METAINFO);
+            this.publish(Constants.META_INFO, output, 0, false);
+        } 
+        // in the other case the controller has sent this message and ignores it
     }
 }

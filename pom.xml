@@ -9,6 +9,7 @@
 		<version>3.0.2</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
+	
 	<groupId>es.us.robot</groupId>
 	<artifactId>edscorbot-java-mqtt</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
