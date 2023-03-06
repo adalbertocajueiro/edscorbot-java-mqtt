@@ -16,4 +16,9 @@ public class Client {
     public Client() {
     }
 
+    @Override
+    public String toString() {
+        return this.id;
+    }
+    
 }

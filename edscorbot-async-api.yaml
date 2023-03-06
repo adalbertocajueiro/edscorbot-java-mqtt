@@ -212,7 +212,7 @@ components:
           items:
             $ref: '#/components/schemas/JointInfo'
 
-        option:
+        signal:
           type: integer
           description: a signal indicating if is a request (ARM_GET_METAINFO) or a response (ARM_METAINFO)
           enum:
@@ -238,6 +238,8 @@ components:
           $ref: '#/components/schemas/Signal'
         client:
           $ref: '#/components/schemas/Client'
+        status:
+          $ref: '#/components/schemas/Status'
         content:
           oneOf:
             - $ref: '#/components/schemas/Status'

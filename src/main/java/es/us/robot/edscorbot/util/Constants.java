@@ -5,6 +5,8 @@ import java.util.Arrays;
 import com.google.gson.Gson;
 
 import es.us.robot.edscorbot.models.MetaInfoObject;
+import es.us.robot.edscorbot.models.Point;
+import es.us.robot.edscorbot.models.Trajectory;
 import es.us.robot.edscorbot.models.JointInfo;
 
 public class Constants {
@@ -33,6 +35,15 @@ public class Constants {
 
     public static final int port = 1883;
 
+    public static final int ARM_CHECK_STATUS = 3;
+    public static final int ARM_STATUS = 4;
+    public static final int ARM_CONNECT = 5;
+    public static final int ARM_CONNECTED = 6;
+    public static final int ARM_DISCONNECT = 7;
+    public static final int ARM_MOVE_TO_POINT = 8;
+    public static final int ARM_APPLY_TRAJECTORY = 9;
+    public static final int ARM_CANCEL_TRAJECTORY = 10;
+
     public static final String META_INFO = "metainfo";
     public static final String COMMANDS = "commands";
     public static final String MOVED = "moved";
@@ -52,10 +63,22 @@ public class Constants {
     public static void main(String[] args) {
 
         MetaInfoObject obj = new MetaInfoObject();
-        obj.setOption(ArmMetaInfo.ARM_GET_METAINFO);
+        obj.setSignal(ArmMetaInfo.ARM_GET_METAINFO);
         Gson gson = new Gson();
         String objStr = gson.toJson(obj);
         System.out.println(objStr);
+
+        Trajectory t = new Trajectory();
+        double coordinate = 10.0;
+        for (int i = 0; i < 10 ; i++){
+            t.getPoints().add(
+                new Point(
+                    Arrays.asList(coordinate, coordinate, coordinate, coordinate, coordinate, coordinate)));
+            coordinate += 10;
+        }
+        objStr = gson.toJson(t);
+        System.out.println(objStr);
+        System.out.println("End");
         /*
          * Trajectory traj = new Trajectory();
          * traj.setOwner(new Owner("adalberto@gmail.com"));

@@ -12,7 +12,7 @@ import es.us.robot.edscorbot.util.ArmMetaInfo;;
 @Getter
 @Setter
 public class MetaInfoObject {
-    private ArmMetaInfo option;
+    private ArmMetaInfo signal;
     private String name;
     private List<JointInfo> joints;
 
@@ -21,7 +21,7 @@ public class MetaInfoObject {
     }
 
     public MetaInfoObject(ArmMetaInfo option, String name, List<JointInfo> joints) {
-        this.option = option;
+        this.signal = option;
         this.name = name;
         this.joints = joints;
     }

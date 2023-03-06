@@ -1,6 +1,6 @@
 package es.us.robot.edscorbot.util;
 
-public enum CommandSignal{
+public enum CommandSignal {
     ARM_CHECK_STATUS(3),
     ARM_STATUS(4),
     ARM_CONNECT(5),
