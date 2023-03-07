@@ -33,9 +33,12 @@ info:
 
     The implemented controller follows a design in which topics are minimize. Tha is, a single topic is used to send information between providers and consumers in two directions. This reduces the mumber of channels/topics, but increases the implementation complexity in applications as they should communicate in a topic and handle the callback in the same topic. 
 
+
+    Furthermore, to provide the possibility of connecting manhy controllers to a same broker, we include the `Robot Name` as prefix of the channel/topic. For example, let us adopt `EDScorbot` as the robot's name from now on. 
+
     #### Metainfo 
 
-    The requests and the answers concerned with metainfo are encapsulated in the payload of the message (communicated through channel `metainfo`). We distinguish which function or signal is sent/received using integers with the following semantics:
+    The requests and the answers concerned with metainfo are encapsulated in the payload of the message (communicated through channel `EDScorbot/metainfo`). We distinguish which function or signal is sent/received using integers with the following semantics:
 
       * `ARM_GET_METAINFO` (value 1) - provided to clients to use to request the metainfo about all arms connected to the broker. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
 
@@ -44,7 +47,7 @@ info:
 
       #### Functions 
 
-      The functions and the answers exchanged between clients and the controller are encapsulated in the payload of the message (communicate through channel `commands`). We distinguish which function or signal is sent/received using integers wose semantics is as follows:
+      The functions and the answers exchanged between clients and the controller are encapsulated in the payload of the message (communicate through channel `EDScorbot/commands`). We distinguish which function or signal is sent/received using integers wose semantics is as follows:
 
       * `ARM_CHECK_STATUS` (value 3) - provided to CLIENTS use to check the status of the arm. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
 
@@ -88,69 +91,51 @@ defaultContentType: application/json
 #    description: Connection/Disconnection actions to be executed and their related topics
   
 channels:
-  'metainfo':
+  'EDScorbot/metainfo':
     description: Channel/topic provided to allow communication of metainfo. CLIENTS use to request arm's metainfo. We use a design in which different CONTROLLERS can be registered in the broker. Thus, they respond this message and CLIENTS can choose which arm to interact with. This design makes possible to connect a same client application with different arms.   
     publish:
       summary: CLIENTS and CONTROLLERS are publishers
       operationId: metainfoPub
       message:
         payload:
-          type: object
-          properties:
-            info:
-              $ref: '#/components/schemas/MetaInfoObject'
+          $ref: '#/components/schemas/MetaInfoObject'
 
     subscribe:
       summary: CLIENTS and CONTROLLERS are subscribers
       operationId: metainfoSub
       message:
         payload:
-          type: object
-          properties:
-            info:
-              $ref: '#/components/schemas/MetaInfoObject'
+          $ref: '#/components/schemas/MetaInfoObject'
      
-  'commands':
+  'EDScorbot/commands':
     description: Channel/topic provided to allow interactions between CLIENTS and CONTROLLERS, so that commands can be sent to the arm and suitable answers can be returned to CLIENTS.  
     publish:
       summary: CLIENTS and CONTROLLERS are publishers
       operationId: commandsPub
       message:
         payload:
-          type: object
-          properties:
-            command:
-              $ref: '#/components/schemas/CommandObject'
+          $ref: '#/components/schemas/CommandObject'
     subscribe:
       summary: CLIENTS and CONTROLLERS are publishers 
       operationId: commandsSub
       message:
         payload:
-          type: object
-          properties:
-            command:
-              $ref: '#/components/schemas/CommandObject'   
+          $ref: '#/components/schemas/CommandObject'   
   
-  'moved':
+  'EDScorbot/moved':
     description: Channel/topic provided to allow the CONTROLLER to publish the last point of the arm. The controller is supposed to publish this point each time the arm is moved. Therefore, it does not matter if the controller has moved the arm to the home position of is executing an entire trajectory.  
     publish:
       summary: CONTROLLER is publisher
       operationId: movedPub
       message:
         payload:
-          type: object
-          properties:
-            point:
-              $ref: '#/components/schemas/Point'
+          $ref: '#/components/schemas/Point'
     subscribe:
       summary: CLIENTS are subscribers
       operationId: trajectoryPointRec
       message:
         payload:
-          type: object
-          properties:
-            point:
-              $ref: '#/components/schemas/Point'
+          $ref: '#/components/schemas/Point'
   
 components:
   schemas:
@@ -158,7 +143,7 @@ components:
       type: object
       description: A client of the arm. It represents an user that wants to interact with the arm. It encapsulates all relevant information about the arm's client.
       properties:
-        clientId:
+        id:
           type: string
           description: The client identifier (email, token, etc.)
     
@@ -182,11 +167,11 @@ components:
       type: string
       description: The status of the controller (and of the arm) to clients
       enum:
-        - FREE
-        - BUSY
-        - ERROR
+        - FREE (0)
+        - BUSY (-1)
+        - ERROR (-2)
 
-    Signal:
+    CommandSignal:
       type: integer
       description: The function/answer involved in the `commands` topic.  
       enum:
@@ -199,10 +184,21 @@ components:
         - ARM_APPLY_TRAJECTORY = 9
         - ARM_CANCEL_TRAJECTORY = 10
 
+    MetaInfoSignal:
+      type: integer
+      description: a signal indicating if is a request (ARM_GET_METAINFO) or a response (ARM_METAINFO)
+      enum:
+        - ARM_GET_METAINFO = 1
+        - ARM_METAINFO = 2
+
     MetaInfoObject:
       type: object
       description: The metainfo about the robot. For the moment we use only the name and the number of joints of the robot. Each joint has a range between a minimum and a maximum values to be informed in the metainfo. The metainfo containz exactly the number of joints in the robot
+      required:
+        - signal
       properties:
+        signal:
+          $ref: '#/components/schemas/MetaInfoSignal'
         name:
           type: string
           description: The name of the robot
@@ -212,13 +208,6 @@ components:
           items:
             $ref: '#/components/schemas/JointInfo'
 
-        signal:
-          type: integer
-          description: a signal indicating if is a request (ARM_GET_METAINFO) or a response (ARM_METAINFO)
-          enum:
-            - ARM_GET_METAINFO = 1
-            - ARM_METAINFO = 2
-    
     JointInfo:
       type: object
       description: Meta information about a joint. It contains the minimum and the maximum angles of the joint.
@@ -235,7 +224,7 @@ components:
         - signal
       properties:
         signal:
-          $ref: '#/components/schemas/Signal'
+          $ref: '#/components/schemas/CommandSignal'
         client:
           $ref: '#/components/schemas/Client'
         status:

@@ -7,12 +7,11 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 
-import es.us.robot.edscorbot.util.ArmMetaInfo;;
 
 @Getter
 @Setter
 public class MetaInfoObject {
-    private ArmMetaInfo signal;
+    private int signal;
     private String name;
     private List<JointInfo> joints;
 
@@ -20,8 +19,8 @@ public class MetaInfoObject {
         this.joints = new ArrayList<JointInfo>();
     }
 
-    public MetaInfoObject(ArmMetaInfo option, String name, List<JointInfo> joints) {
-        this.signal = option;
+    public MetaInfoObject(int signal, String name, List<JointInfo> joints) {
+        this.signal = signal;
         this.name = name;
         this.joints = joints;
     }

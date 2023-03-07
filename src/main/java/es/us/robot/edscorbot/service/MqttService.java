@@ -23,9 +23,7 @@ import es.us.robot.edscorbot.models.Client;
 import es.us.robot.edscorbot.models.Point;
 import es.us.robot.edscorbot.models.Trajectory;
 import es.us.robot.edscorbot.models.MetaInfoObject;
-import es.us.robot.edscorbot.util.ArmStatus;
 import es.us.robot.edscorbot.util.Constants;
-import es.us.robot.edscorbot.util.ArmMetaInfo;
 import es.us.robot.edscorbot.models.CommandObject;
 
 @Service
@@ -52,7 +50,7 @@ public class MqttService {
         }
     }
 
-    private ArmStatus status;
+    private int status;
     private Client owner;
     private boolean executingTrajectory = true;
 
@@ -63,7 +61,7 @@ public class MqttService {
             Arrays.asList(Constants.META_INFO, Constants.COMMANDS));
 
     public MqttService() throws MqttException, InterruptedException {
-        this.status = ArmStatus.FREE;
+        this.status = Constants.FREE;
         System.out.println("Creating MQTT client for subscriptions...");
         this.mqttClientSubscriber = new MqttClient("tcp://" + Constants.hostname + ":" + Constants.port,
                 Constants.clientIdSub);
@@ -152,13 +150,13 @@ public class MqttService {
         String content = message.toString();
         MetaInfoObject input = gson.fromJson(content, MetaInfoObject.class);
 
-        ArmMetaInfo option = input.getSignal();
+        int option = input.getSignal();
 
-        if (option.equals(ArmMetaInfo.ARM_GET_METAINFO)) { // client has sent this message
+        if (option == Constants.ARM_GET_METAINFO) { // client has sent this message
             MetaInfoObject output = new MetaInfoObject();
             output.setName(Constants.controllerName);
             output.setJoints(Constants.joints);
-            output.setSignal(ArmMetaInfo.ARM_METAINFO);
+            output.setSignal(Constants.ARM_METAINFO);
             System.out.println("Meta info requested. Sending...");
             this.publish((Constants.controllerName + "/" + Constants.META_INFO), output, 0, false);
         }
@@ -189,7 +187,7 @@ public class MqttService {
                         output.setSignal(Constants.ARM_CONNECTED);
                         if (this.owner == null) {
                             this.owner = client;
-                            this.status = ArmStatus.BUSY;
+                            this.status = Constants.BUSY;
                             output.setStatus(this.status);
                             output.setClient(this.owner);
                             this.publish(Constants.controllerName + "/" + Constants.COMMANDS, output, 0, false);
@@ -306,7 +304,7 @@ public class MqttService {
                         if (this.owner != null) {
                             if (this.owner.getId().equals(client.getId())) {
                                 this.owner = null;
-                                this.status = ArmStatus.FREE;
+                                this.status = Constants.FREE;
                                 output.setStatus(this.status);
                                 output.setClient(this.owner);
                                 this.publish(Constants.controllerName + "/" + Constants.COMMANDS, output, 0, false);

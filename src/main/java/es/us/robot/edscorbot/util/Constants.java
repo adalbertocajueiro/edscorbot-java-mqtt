@@ -21,20 +21,25 @@ public class Constants {
             new JointInfo(0, 0),
             new JointInfo(0, 0));
 
+    // parameters to interact with broker
     public static final boolean automaticReconnect = true;
-
     public static final boolean cleanSession = true;
-
     public static final int connectionTimeout = 5000;
-
     public static final String clientIdSub = "SCORBOT-CONTROLLER_SUB";
-
     public static final String clientIdPub = "SCORBOT-CONTROLLER_PUB";
-
     public static final String hostname = "localhost";
-
     public static final int port = 1883;
 
+    //arm status constants
+    public static final int FREE = 0;
+    public static final int BUSY = -1;
+    public static final int ERROR = -2;
+
+    // metainfo constants
+    public static final int ARM_GET_METAINFO = 1;
+    public static final int ARM_METAINFO = 2;
+
+    // commands constants
     public static final int ARM_CHECK_STATUS = 3;
     public static final int ARM_STATUS = 4;
     public static final int ARM_CONNECT = 5;
@@ -44,26 +49,15 @@ public class Constants {
     public static final int ARM_APPLY_TRAJECTORY = 9;
     public static final int ARM_CANCEL_TRAJECTORY = 10;
 
+    // subtopics for each robot
     public static final String META_INFO = "metainfo";
     public static final String COMMANDS = "commands";
     public static final String MOVED = "moved";
 
-    // subscriber topics
-    public static final String CHECK_STATUS = "checkArmStatus";
-    public static final String CONNECT = "armConnect";
-    public static final String DISCONNECT = "armDisconnect";
-    public static final String TRAJECTORY = "trajectory";
-    public static final String CANCEL_TRAJECTORY = "cancelTrajectory";
-
-    // publisher topics
-    public static final String STATUS = "armStatus";
-    public static final String CONNECTED = "armConnected";
-    public static final String POINT = "point";
-
     public static void main(String[] args) {
 
         MetaInfoObject obj = new MetaInfoObject();
-        obj.setSignal(ArmMetaInfo.ARM_GET_METAINFO);
+        obj.setSignal(Constants.ARM_GET_METAINFO);
         Gson gson = new Gson();
         String objStr = gson.toJson(obj);
         System.out.println(objStr);
