@@ -29,7 +29,7 @@ This project has been developed using the following tools:
   - `allow_anonymous true`
 * Start you Mosquitto Broker in localhost and port 1883. Open a terminal and start mosquitto. Normally this is achieved by running the command `mosquitto`. The terminal remains watching the broker execution. 
 * Run the class EdscorbotMqttApplication.java and the server should start. This step is more user friendly if executed from the vscode editor, as it presents options for Run and Debug above the `main` method.
-* Open a new terminal to simulate subscribers (arm's clients) receiving messages from the controller. Run the command `mosquitto_sub -h localhost -p 1883 -t "EDScorbot/metainfo"  -t "EDScorbot/commands" -t "EDScorbot/moved" -q 0` to launch a consumer subscribed in all channels. The terminal remains watching the consumer and shows the messages delivered to it. 
+* Open a new terminal to simulate subscribers (arm's clients) receiving messages from the controller. Run the command `mosquitto_sub -h localhost -p 1883 -t "metainfo"  -t "EDScorbot/commands" -t "EDScorbot/moved" -q 0` to launch a consumer subscribed in all channels. The terminal remains watching the consumer and shows the messages delivered to it. 
 * Open a new terminal to simulate clients trying to interact with the controller. Run the commands:
   - `mosquitto_pub -h localhost -p 1883 -t "EDScorbot/metainfo" -m "{ \"signal\": 1}" -q 0` to publish a message of a client requesting the meta info of all arms (see it in the consumer terminal)
   - `mosquitto_pub -h localhost -p 1883 -t "EDScorbot/commands" -m "{ \"signal\": 3}" -q 0` to publish a message of a client requesting the status of the arm (see it in the consumer terminal)

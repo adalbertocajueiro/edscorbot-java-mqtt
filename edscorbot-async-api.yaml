@@ -34,11 +34,11 @@ info:
     The implemented controller follows a design in which topics are minimize. Tha is, a single topic is used to send information between providers and consumers in two directions. This reduces the mumber of channels/topics, but increases the implementation complexity in applications as they should communicate in a topic and handle the callback in the same topic. 
 
 
-    Furthermore, to provide the possibility of connecting manhy controllers to a same broker, we include the `Robot Name` as prefix of the channel/topic. For example, let us adopt `EDScorbot` as the robot's name from now on. 
+    Furthermore, to provide the possibility of connecting many controllers to a same broker, we include the `Robot Name` as prefix of the channel/topic. For example, let us adopt `EDScorbot` as the robot's name from now on. We adopt the channel `metainfo` as a meta channel on which controllers can publish information about themsalves, such as name of the arm and information about joints (maximum angle, minimum angle, number of joints, etc.). 
 
     #### Metainfo 
 
-    The requests and the answers concerned with metainfo are encapsulated in the payload of the message (communicated through channel `EDScorbot/metainfo`). We distinguish which function or signal is sent/received using integers with the following semantics:
+    The requests and the answers concerned with metainfo are encapsulated in the payload of the message (communicated through channel `metainfo`). We distinguish which function or signal is sent/received using integers with the following semantics:
 
       * `ARM_GET_METAINFO` (value 1) - provided to clients to use to request the metainfo about all arms connected to the broker. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
 
@@ -91,8 +91,8 @@ defaultContentType: application/json
 #    description: Connection/Disconnection actions to be executed and their related topics
   
 channels:
-  'EDScorbot/metainfo':
-    description: Channel/topic provided to allow communication of metainfo. CLIENTS use to request arm's metainfo. We use a design in which different CONTROLLERS can be registered in the broker. Thus, they respond this message and CLIENTS can choose which arm to interact with. This design makes possible to connect a same client application with different arms.   
+  'metainfo':
+    description: Channel/topic provided to allow communication of metainfos. This channel plays the role of a "meta" channel where multiple CONTROLLERS can publish information about themselves and CLIENTS can obtain information about them at once.  We use a design in which different CONTROLLERS can be registered in the broker. Thus, they respond this message and CLIENTS can choose which arm to interact with. This design makes possible to connect a same client application with different arms.   
     publish:
       summary: CLIENTS and CONTROLLERS are publishers
       operationId: metainfoPub
@@ -167,9 +167,9 @@ components:
       type: string
       description: The status of the controller (and of the arm) to clients
       enum:
-        - FREE (0)
-        - BUSY (-1)
-        - ERROR (-2)
+        - FREE
+        - BUSY
+        - ERROR
 
     CommandSignal:
       type: integer

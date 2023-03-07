@@ -1,8 +1,8 @@
 package es.us.robot.edscorbot.service;
 
-import java.util.Set;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -28,37 +28,12 @@ import es.us.robot.edscorbot.models.CommandObject;
 
 @Service
 public class MqttService {
-
-    enum CommandSignal {
-        ARM_CHECK_STATUS(3),
-        ARM_STATUS(4),
-        ARM_CONNECT(5),
-        ARM_CONNECTED(6),
-        ARM_DISCONNECT(7),
-        ARM_MOVE_TO_POINT(8),
-        ARM_APPLY_TRAJECTORY(9),
-        ARM_CANCEL_TRAJECTORY(10);
-
-        private final int number;
-
-        private CommandSignal(int number) {
-            this.number = number;
-        }
-
-        public int getNumber() {
-            return number;
-        }
-    }
-
     private int status;
     private Client owner;
     private boolean executingTrajectory = true;
 
     private IMqttClient mqttClientSubscriber;
     private IMqttClient mqttClientPublisher;
-
-    private Set<String> topicsSubscriber = new HashSet<String>(
-            Arrays.asList(Constants.META_INFO, Constants.COMMANDS));
 
     public MqttService() throws MqttException, InterruptedException {
         this.status = Constants.FREE;
@@ -84,13 +59,12 @@ public class MqttService {
     }
 
     private void subscribeAllTopics() throws MqttException, InterruptedException {
-        String[] topicFilters = this.topicsSubscriber
-                .stream()
-                .map(top -> (Constants.controllerName + "/" + top))
-                .toList()
-                .toArray(new String[0]);
+        List<String> topics = new ArrayList<String>();
+        
+        topics.add(Constants.META_INFO);
+        topics.add(Constants.controllerName + "/" + Constants.COMMANDS);
 
-        int[] qos = new int[this.topicsSubscriber.size()];
+        int[] qos = new int[topics.size()];
 
         mqttClientSubscriber.setCallback(new MqttCallback() {
 
@@ -110,9 +84,9 @@ public class MqttService {
             }
 
         });
-
-        mqttClientSubscriber.subscribe(topicFilters, qos);
-        System.out.println("    subscribed on topics " + Arrays.toString(topicFilters));
+        String[] topicsArray = topics.toArray(new String[0]);
+        mqttClientSubscriber.subscribe(topicsArray, qos);
+        System.out.println("    subscribed on topics " + Arrays.toString(topicsArray));
     }
 
     public void publish(String topic, Object payload, int qos, boolean retained)
@@ -131,7 +105,7 @@ public class MqttService {
             throws MqttPersistenceException, MqttException, InterruptedException {
 
         switch (topic) {
-            case Constants.controllerName + "/" + Constants.META_INFO:
+            case Constants.META_INFO:
                 this.handleMetaInfo(message);
                 break;
             case Constants.controllerName + "/" + Constants.COMMANDS:
@@ -150,15 +124,15 @@ public class MqttService {
         String content = message.toString();
         MetaInfoObject input = gson.fromJson(content, MetaInfoObject.class);
 
-        int option = input.getSignal();
+        int signal = input.getSignal();
 
-        if (option == Constants.ARM_GET_METAINFO) { // client has sent this message
+        if (signal == Constants.ARM_GET_METAINFO) { // client has sent this message
             MetaInfoObject output = new MetaInfoObject();
             output.setName(Constants.controllerName);
             output.setJoints(Constants.joints);
             output.setSignal(Constants.ARM_METAINFO);
             System.out.println("Meta info requested. Sending...");
-            this.publish((Constants.controllerName + "/" + Constants.META_INFO), output, 0, false);
+            this.publish(Constants.META_INFO, output, 0, false);
         }
         // in the other case the controller has sent this message and ignores it
     }
