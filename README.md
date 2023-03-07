@@ -22,7 +22,12 @@ This project has been developed using the following tools:
 * Steps 1 and 2 install the necessary dependencies to re-generate the documentation and need to run only at once. As the project has already a package.json file containing the names of all dependencies to generate documentation, you can also just run `npm install` and the above dependencies will be installed.
 * (Step 3 - optional) The file `edscorbot-async-api.yaml` contains a valid specification of its AsyncAPI. If you want to generate its documentation in `docs` folder run `asyncapi generate fromTemplate edscorbot-async-api.yaml @asyncapi/html-template -o docs`  
 * For more information about customizing doc generation please refer to (https://www.asyncapi.com/docs/tools/generator/usage)
-* Start you Mosquitto Broker in localhost and port 1883. Open a terminal and start mosquitto. Normally this is achieved by running the command `mosquitto`. The terminal remains watching the broker execution
+* Configure Mosquitto to start a tcp listener on port 1883 (to accept messages from the controller) and a web sockets listener on port 8080 (to accept messages from angular): edit your conf file (normally mosquitto.conf) and add these lines:
+  - `listener 1883`
+  - `listener 8080`
+  - `protocol websockets`
+  - `allow_anonymous true`
+* Start you Mosquitto Broker in localhost and port 1883. Open a terminal and start mosquitto. Normally this is achieved by running the command `mosquitto`. The terminal remains watching the broker execution. 
 * Run the class EdscorbotMqttApplication.java and the server should start. This step is more user friendly if executed from the vscode editor, as it presents options for Run and Debug above the `main` method.
 * Open a new terminal to simulate subscribers (arm's clients) receiving messages from the controller. Run the command `mosquitto_sub -h localhost -p 1883 -t "EDScorbot/metainfo"  -t "EDScorbot/commands" -t "EDScorbot/moved" -q 0` to launch a consumer subscribed in all channels. The terminal remains watching the consumer and shows the messages delivered to it. 
 * Open a new terminal to simulate clients trying to interact with the controller. Run the commands:
