@@ -24,4 +24,5 @@ public class MetaInfoObject {
         this.name = name;
         this.joints = joints;
     }
+    
 }

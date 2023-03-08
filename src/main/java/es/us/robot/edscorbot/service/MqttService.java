@@ -131,7 +131,7 @@ public class MqttService {
             output.setName(Constants.controllerName);
             output.setJoints(Constants.joints);
             output.setSignal(Constants.ARM_METAINFO);
-            System.out.println("Meta info requested. Sending...");
+            System.out.println("Meta info requested. Sending " + gson.toJson(output) + " through " + Constants.META_INFO);
             this.publish(Constants.META_INFO, output, 0, false);
         }
         // in the other case the controller has sent this message and ignores it
@@ -149,7 +149,9 @@ public class MqttService {
             case Constants.ARM_CHECK_STATUS:
                 output.setSignal(Constants.ARM_STATUS);
                 output.setStatus(this.status);
-                System.out.println("Status requested. Sending...");
+                output.setClient(this.owner);
+                System.out.println("Status requested. Sending " + gson.toJson(output) + " through " + Constants.controllerName
+                        + "/" + Constants.COMMANDS);
                 this.publish(Constants.controllerName + "/" + Constants.COMMANDS, output, 0, false);
                 break;
             case Constants.ARM_CONNECT:
