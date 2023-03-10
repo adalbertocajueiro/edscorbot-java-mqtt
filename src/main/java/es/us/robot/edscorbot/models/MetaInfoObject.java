@@ -11,7 +11,7 @@ import java.util.ArrayList;
 @Getter
 @Setter
 public class MetaInfoObject {
-    private int signal;
+    private int signal; //can be two values: ARM_GET_METAINFO = 1 and ARM_METAINFO
     private String name;
     private List<JointInfo> joints;
 

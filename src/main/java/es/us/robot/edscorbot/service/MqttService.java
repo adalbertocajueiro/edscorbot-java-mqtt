@@ -23,12 +23,13 @@ import es.us.robot.edscorbot.models.Client;
 import es.us.robot.edscorbot.models.Point;
 import es.us.robot.edscorbot.models.Trajectory;
 import es.us.robot.edscorbot.models.MetaInfoObject;
+import es.us.robot.edscorbot.models.MovedObject;
 import es.us.robot.edscorbot.util.Constants;
 import es.us.robot.edscorbot.models.CommandObject;
 
 @Service
 public class MqttService {
-    private int status;
+    private boolean errorState;
     private Client owner;
     private boolean executingTrajectory = true;
 
@@ -36,7 +37,7 @@ public class MqttService {
     private IMqttClient mqttClientPublisher;
 
     public MqttService() throws MqttException, InterruptedException {
-        this.status = Constants.FREE;
+        this.errorState = false;
         System.out.println("Creating MQTT client for subscriptions...");
         this.mqttClientSubscriber = new MqttClient("tcp://" + Constants.hostname + ":" + Constants.port,
                 Constants.clientIdSub);
@@ -126,7 +127,7 @@ public class MqttService {
 
         int signal = input.getSignal();
 
-        if (signal == Constants.ARM_GET_METAINFO) { // client has sent this message
+        if (signal == Constants.ARM_GET_METAINFO) { // client requested meta info
             MetaInfoObject output = new MetaInfoObject();
             output.setName(Constants.controllerName);
             output.setJoints(Constants.joints);
@@ -134,7 +135,6 @@ public class MqttService {
             System.out.println("Meta info requested. Sending " + gson.toJson(output) + " through " + Constants.META_INFO);
             this.publish(Constants.META_INFO, output, 0, false);
         }
-        // in the other case the controller has sent this message and ignores it
     }
 
     private void handleCommands(MqttMessage message)
@@ -146,9 +146,9 @@ public class MqttService {
         int signal = input.getAsJsonObject().get("signal").getAsInt();
         CommandObject output = new CommandObject(Constants.ARM_STATUS);
         switch (signal) {
-            case Constants.ARM_CHECK_STATUS:
+            case Constants.ARM_CHECK_STATUS: //client requested arm's status
                 output.setSignal(Constants.ARM_STATUS);
-                output.setStatus(this.status);
+                output.setErrorState(this.errorState);
                 output.setClient(this.owner);
                 System.out.println("Status requested. Sending " + gson.toJson(output) + " through " + Constants.controllerName
                         + "/" + Constants.COMMANDS);
@@ -163,8 +163,7 @@ public class MqttService {
                         output.setSignal(Constants.ARM_CONNECTED);
                         if (this.owner == null) {
                             this.owner = client;
-                            this.status = Constants.BUSY;
-                            output.setStatus(this.status);
+                            output.setErrorState(this.errorState);
                             output.setClient(this.owner);
                             this.publish(Constants.controllerName + "/" + Constants.COMMANDS, output, 0, false);
                             System.out.println(" ==> Connected!");
@@ -276,12 +275,11 @@ public class MqttService {
                     Client client = gson.fromJson(ownerStr, Client.class);
                     System.out.print("Client wants to disconnect to the arm: " + client.getId());
                     if (this.validatesClient(client)) {
-                        output.setSignal(Constants.ARM_STATUS);
+                        output.setSignal(Constants.ARM_DISCONNECTED);
                         if (this.owner != null) {
                             if (this.owner.getId().equals(client.getId())) {
                                 this.owner = null;
-                                this.status = Constants.FREE;
-                                output.setStatus(this.status);
+                                output.setErrorState(this.errorState);
                                 output.setClient(this.owner);
                                 this.publish(Constants.controllerName + "/" + Constants.COMMANDS, output, 0, false);
                                 System.out.println(" ==> Diconnected!");
@@ -343,18 +341,21 @@ public class MqttService {
         return result;
     }
 
-    private void moveToPointAndPublish(Point p) throws MqttPersistenceException, MqttException{
-        System.out.print("Moving arm to point " + p);
+    private void moveToPointAndPublish(Point point) throws MqttPersistenceException, MqttException{
+        System.out.print("Moving arm to point " + point);
         try{
             Thread.sleep(1000);
             System.out.println(" ==> arm moved. Notifying clients about the last point");
-            this.publish(Constants.controllerName + "/" + Constants.MOVED, p, 0, false);
+            MovedObject output = new MovedObject();
+            output.setClient(this.owner);
+            output.setErrorState(this.errorState);
+            output.setContent(point);
+            this.publish(Constants.controllerName + "/" + Constants.MOVED, output, 0, false);
         } catch(InterruptedException ex){
 
         }
         
     }
-
 
 
     private void moveAccordingToTrajectoryAndPublish(Trajectory trajectory) throws MqttPersistenceException, MqttException{
@@ -374,12 +375,16 @@ public class MqttService {
 
                 mqttClientPublisher.publish(topic, mqttMessage);
             }
-            private void moveToPointAndPublish(Point p) throws MqttPersistenceException, MqttException {
-                System.out.print("Moving arm to point " + p);
+            private void moveToPointAndPublish(Point point) throws MqttPersistenceException, MqttException {
+                System.out.print("Moving arm to point " + point);
                 try {
                     Thread.sleep(1000);
                     System.out.println(" ==> arm moved. Notifying clients about the last point");
-                    this.publish(Constants.controllerName + "/" + Constants.MOVED, p, 0, false);
+                    MovedObject output = new MovedObject();
+                    output.setClient(owner);
+                    output.setErrorState(errorState);
+                    output.setContent(point);
+                    this.publish(Constants.controllerName + "/" + Constants.MOVED, output, 0, false);
                 } catch (InterruptedException ex) {
 
                 }

@@ -6,19 +6,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CommandObject {
-    private int signal;
+public class MovedObject {
     private Client client;
     private boolean errorState;
-    private Object content;
+    private Point content;
    
 
-    public CommandObject(int signal) {
-        this.signal = signal;
+    public MovedObject() {
     }
 
-    public CommandObject(int signal, Client client, boolean error, Object content) {
-        this.signal = signal;
+    public MovedObject(Client client, boolean error, Point content) {
         this.client = client;
         this.errorState= error;
         this.content = content;

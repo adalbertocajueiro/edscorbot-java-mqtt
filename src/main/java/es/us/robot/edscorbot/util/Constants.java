@@ -30,11 +30,6 @@ public class Constants {
     public static final String hostname = "localhost";
     public static final int port = 1883;
 
-    //arm status constants
-    public static final int FREE = 0;
-    public static final int BUSY = -1;
-    public static final int ERROR = -2;
-
     // metainfo constants
     public static final int ARM_GET_METAINFO = 1;
     public static final int ARM_METAINFO = 2;
@@ -44,10 +39,11 @@ public class Constants {
     public static final int ARM_STATUS = 4;
     public static final int ARM_CONNECT = 5;
     public static final int ARM_CONNECTED = 6;
-    public static final int ARM_DISCONNECT = 7;
-    public static final int ARM_MOVE_TO_POINT = 8;
-    public static final int ARM_APPLY_TRAJECTORY = 9;
-    public static final int ARM_CANCEL_TRAJECTORY = 10;
+    public static final int ARM_MOVE_TO_POINT = 7;
+    public static final int ARM_APPLY_TRAJECTORY = 8;
+    public static final int ARM_CANCEL_TRAJECTORY = 9;
+    public static final int ARM_DISCONNECT = 10;
+    public static final int ARM_DISCONNECTED = 11;
 
     // subtopics for each robot
     public static final String META_INFO = "metainfo";

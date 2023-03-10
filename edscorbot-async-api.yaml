@@ -56,15 +56,18 @@ info:
      * `ARM_CONNECT` (value 5) - provided to CLIENTS use to connect to the arm, so they can become owners. If the arm is available, the controller promotes on client to `owner` and notifies all clients about it. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
 
       * `ARM_CONNECTED` (value 6) - provided to the CONTROLLER inform which client has successfully connected to the arm and became its `owner`. Only one client can be the amr's owner at a time. By the message content, client are able to know if they have been rejected as owner. CONTROLLER (publisher) sends this data to the CLIENTS (subscribers)
-
-      * `ARM_DISCONNECT` (value 7) - provided to allow arm's owner (CLIENT) to `release` the arm. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
         
-      * `ARM_MOVE_TO_POINT` (value 8) - provided to allow the owner to move the arm in a point by point interaction. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
+      * `ARM_MOVE_TO_POINT` (value 7) - provided to allow the owner to move the arm in a point by point interaction. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
 
 
-      * `ARM_APPLY_TRAJECTORY` (value 9) - provided to allow arm's owner to send a trajectory to the controller. A trajectory is a sequence of points and its execution respects the order of the points. Each point represents a single movement to be executed by the robot. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
+      * `ARM_APPLY_TRAJECTORY` (value 8) - provided to allow arm's owner to send a trajectory to the controller. A trajectory is a sequence of points and its execution respects the order of the points. Each point represents a single movement to be executed by the robot. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
 
-      * `ARM_CANCEL_TRAJECTORY` (value 10) - provided to allow arm's owner to cancel a trajectory execution at any time. The arm stops in the last point and communicates it. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
+      * `ARM_CANCEL_TRAJECTORY` (value 9) - provided to allow arm's owner to cancel a trajectory execution at any time. The arm stops in the last point and communicates it. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
+
+      * `ARM_DISCONNECT` (value 10) - provided to allow arm's owner (CLIENT) to `release` the arm. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
+
+      * `ARM_DISCONNECTED` (value 11) - provided to allow the CONTROLLER inform that the owner has disconnected and the arm is available. CONTROLLER (publisher) sends this data to the CLIENTS (subscribers)
+
 
 
   termsOfService: https://asyncapi.org/terms/
@@ -129,13 +132,13 @@ channels:
       operationId: movedPub
       message:
         payload:
-          $ref: '#/components/schemas/Point'
+          $ref: '#/components/schemas/MovedObject'
     subscribe:
       summary: CLIENTS are subscribers
       operationId: trajectoryPointRec
       message:
         payload:
-          $ref: '#/components/schemas/Point'
+          $ref: '#/components/schemas/MovedObject'
   
 components:
   schemas:
@@ -163,13 +166,9 @@ components:
       items:
         $ref: '#/components/schemas/Point'
           
-    Status:
-      type: string
-      description: The status of the controller (and of the arm) to clients
-      enum:
-        - FREE
-        - BUSY
-        - ERROR
+    ErrorState:
+      type: boolean
+      description: A flag representing that the controller is in an internal error state probably due to some problem with the physical arm. 
 
     CommandSignal:
       type: integer
@@ -179,10 +178,11 @@ components:
         - ARM_STATUS = 4
         - ARM_CONNECT = 5
         - ARM_CONNECTED = 6
-        - ARM_DISCONNECT = 7
-        - ARM_MOVE_TO_POINT = 8
-        - ARM_APPLY_TRAJECTORY = 9
-        - ARM_CANCEL_TRAJECTORY = 10
+        - ARM_MOVE_TO_POINT = 7
+        - ARM_APPLY_TRAJECTORY = 8
+        - ARM_CANCEL_TRAJECTORY = 9
+        - ARM_DISCONNECT = 10
+        - ARM_DISCONNECTED = 11
 
     MetaInfoSignal:
       type: integer
@@ -227,13 +227,22 @@ components:
           $ref: '#/components/schemas/CommandSignal'
         client:
           $ref: '#/components/schemas/Client'
-        status:
-          $ref: '#/components/schemas/Status'
+        error:
+          $ref: '#/components/schemas/ErrorState'
         content:
           oneOf:
-            - $ref: '#/components/schemas/Status'
             - $ref: '#/components/schemas/Point'
             - $ref: '#/components/schemas/Trajectory'
+    MovedObject:
+      type: object
+      description: The object to be communicated though channel `moved`. It contains one point, the error state and the client (owner)
+      properties:
+        client:
+          $ref: '#/components/schemas/Client'
+        error:
+          $ref: '#/components/schemas/ErrorState'
+        content:
+          $ref: '#/components/schemas/Point'
 
   securitySchemes:
       user-password:
