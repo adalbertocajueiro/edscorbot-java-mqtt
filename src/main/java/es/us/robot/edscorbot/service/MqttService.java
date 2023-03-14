@@ -57,6 +57,7 @@ public class MqttService {
         System.out.println("Connecting MQTT publications client to the broker...");
         mqttClientPublisher.connect(options);
         System.out.println("SCORBOT CONTROLLER is ready to send/receive messages");
+        System.out.println("Publishing metainfos of " + Constants.controllerName);
     }
 
     private void subscribeAllTopics() throws MqttException, InterruptedException {
