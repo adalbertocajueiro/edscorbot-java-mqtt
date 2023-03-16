@@ -263,6 +263,12 @@ public class MqttService {
                             if (this.owner.getId().equals(client.getId())) {
                                 // the loop must be cancelled
                                 this.executingTrajectory = false;
+                                
+                                output.setSignal(Constants.ARM_CANCELED_TRAJECTORY);
+                                output.setErrorState(this.errorState);
+                                output.setClient(this.owner);
+                                this.publish(Constants.CONTROLLER_NAME + "/" + Constants.COMMANDS, output, 0, false);
+                                System.out.println(" Trajectory cancelled!");
                             } else {
                                 // athother owner tried to apply trajectory ==> ignore
                             }
