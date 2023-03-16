@@ -11,22 +11,22 @@ import es.us.robot.edscorbot.models.JointInfo;
 
 public class Constants {
 
-    public static final String controllerName = "EDScorbot";
+    public static final String CONTROLLER_NAME = "EDScorbot";
 
     public static final List<JointInfo> joints = Arrays.asList(
             new JointInfo(-450, 500),
             new JointInfo(-950, 800),
             new JointInfo(-350, 350),
             new JointInfo(-1500, 1600),
-            new JointInfo(0, 0),
-            new JointInfo(0, 0));
+            new JointInfo(-360, 360),
+            new JointInfo(0, 100));
 
     // parameters to interact with broker
     public static final boolean automaticReconnect = true;
     public static final boolean cleanSession = true;
     public static final int connectionTimeout = 5000;
-    public static final String clientIdSub = "SCORBOT-CONTROLLER_SUB";
-    public static final String clientIdPub = "SCORBOT-CONTROLLER_PUB";
+    public static final String clientIdSub = CONTROLLER_NAME + "_SUB";
+    public static final String clientIdPub = CONTROLLER_NAME + "_PUB";
     public static final String hostname = "localhost";
     public static final int port = 1883;
 
@@ -60,10 +60,10 @@ public class Constants {
 
         Trajectory t = new Trajectory();
         double coordinate = 10.0;
-        for (int i = 0; i < 10 ; i++){
+        for (int i = 0; i < 10; i++) {
             t.getPoints().add(
-                new Point(
-                    Arrays.asList(coordinate, coordinate, coordinate, coordinate, coordinate, coordinate)));
+                    new Point(
+                            Arrays.asList(coordinate, coordinate, coordinate, coordinate, coordinate, coordinate)));
             coordinate += 10;
         }
         objStr = gson.toJson(t);
