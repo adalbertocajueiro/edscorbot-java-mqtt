@@ -58,6 +58,7 @@ public class MqttService {
         mqttClientPublisher.connect(options);
         System.out.println("SCORBOT CONTROLLER is ready to send/receive messages");
         System.out.println("Publishing metainfos of " + Constants.CONTROLLER_NAME);
+        this.publishMetaInfo();
     }
 
     private void subscribeAllTopics() throws MqttException, InterruptedException {
@@ -130,14 +131,19 @@ public class MqttService {
         int signal = input.getSignal();
 
         if (signal == Constants.ARM_GET_METAINFO) { // client requested meta info
-            MetaInfoObject output = new MetaInfoObject();
-            output.setName(Constants.CONTROLLER_NAME);
-            output.setJoints(Constants.joints);
-            output.setSignal(Constants.ARM_METAINFO);
-            System.out
-                    .println("Meta info requested. Sending " + gson.toJson(output) + " through " + Constants.META_INFO);
-            this.publish(Constants.META_INFO, output, 0, false);
+            this.publishMetaInfo();
         }
+    }
+
+    private void publishMetaInfo() throws MqttPersistenceException, MqttException, InterruptedException{
+        Gson gson = new Gson();
+        MetaInfoObject output = new MetaInfoObject();
+        output.setName(Constants.CONTROLLER_NAME);
+        output.setJoints(Constants.joints);
+        output.setSignal(Constants.ARM_METAINFO);
+        System.out
+                .println("Meta info requested. Sending " + gson.toJson(output) + " through " + Constants.META_INFO);
+        this.publish(Constants.META_INFO, output, 0, false);
     }
 
     private void handleCommands(MqttMessage message)
