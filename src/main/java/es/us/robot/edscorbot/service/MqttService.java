@@ -296,7 +296,7 @@ public class MqttService {
                             if (this.owner.getId().equals(client.getId())) {
                                 this.owner = null;
                                 output.setErrorState(this.errorState);
-                                output.setClient(this.owner);
+                                output.setClient(client);
                                 this.publish(Constants.CONTROLLER_NAME + "/" + Constants.COMMANDS, output, 0, false);
                                 System.out.println(" ==> Diconnected!");
                             } else {
