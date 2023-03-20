@@ -177,6 +177,11 @@ public class MqttService {
                             output.setClient(this.owner);
                             this.publish(Constants.CONTROLLER_NAME + "/" + Constants.COMMANDS, output, 0, false);
                             System.out.println(" ==> Connected!");
+                            System.out.println("Searching home position. This process mey take some time... ");
+                            Thread.sleep(4000); // this simulates searching home
+                            System.out.println("Home position seached!");
+                            output.setSignal(Constants.ARM_HOME_SEARCHED);
+                            this.publish(Constants.CONTROLLER_NAME + "/" + Constants.COMMANDS, output, 0, false);
                         } else {
                             System.out.println(" ==> Connection refused. Arm is busy");
                         }

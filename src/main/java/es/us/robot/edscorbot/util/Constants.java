@@ -45,6 +45,7 @@ public class Constants {
     public static final int ARM_CANCELED_TRAJECTORY = 10;
     public static final int ARM_DISCONNECT = 11;
     public static final int ARM_DISCONNECTED = 12;
+    public static final int ARM_HOME_SEARCHED = 13;
 
     // subtopics for each robot
     public static final String META_INFO = "metainfo";
