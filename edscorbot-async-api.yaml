@@ -64,9 +64,13 @@ info:
 
       * `ARM_CANCEL_TRAJECTORY` (value 9) - provided to allow arm's owner to cancel a trajectory execution at any time. The arm stops in the last point and communicates it. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
 
-      * `ARM_DISCONNECT` (value 10) - provided to allow arm's owner (CLIENT) to `release` the arm. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
+      * `ARM_CANCELED_TRAJECTORY` (value 10) - provided to allow arm's owner to cancel a trajectory execution at any time. The arm stops in the last point and communicates it. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
 
-      * `ARM_DISCONNECTED` (value 11) - provided to allow the CONTROLLER inform that the owner has disconnected and the arm is available. CONTROLLER (publisher) sends this data to the CLIENTS (subscribers)
+      * `ARM_DISCONNECT` (value 11) - provided to allow arm's owner (CLIENT) to `release` the arm. CLIENTS (publishers) send this function request to the CONTROLLER (subscriber)
+
+      * `ARM_DISCONNECTED` (value 12) - provided to allow the CONTROLLER inform that the owner has disconnected and the arm is available. CONTROLLER (publisher) sends this data to the CLIENTS (subscribers)
+
+      * `ARM_HOME_SEARCHED` (value 13) - provided to allow the CONTROLLER inform that the arm has been moved to home position. This is necessary because when a user connects to the arm, the CONTROLLER must move it to home by using the procedure `search_home` which might take about 2 min at most. While the arm is searching its home position, no other operation is allowed. CONTROLLER (publisher) sends this data to the CLIENTS (subscribers)
 
 
 
@@ -181,8 +185,10 @@ components:
         - ARM_MOVE_TO_POINT = 7
         - ARM_APPLY_TRAJECTORY = 8
         - ARM_CANCEL_TRAJECTORY = 9
-        - ARM_DISCONNECT = 10
-        - ARM_DISCONNECTED = 11
+        - ARM_CANCELED_TRAJECTORY = 10 
+        - ARM_DISCONNECT = 11
+        - ARM_DISCONNECTED = 12
+        - ARM_HOME_SEARCHED = 13
 
     MetaInfoSignal:
       type: integer
