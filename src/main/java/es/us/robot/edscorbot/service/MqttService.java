@@ -183,6 +183,7 @@ public class MqttService {
                             output.setSignal(Constants.ARM_HOME_SEARCHED);
                             this.publish(Constants.CONTROLLER_NAME + "/" + Constants.COMMANDS, output, 0, false);
                         } else {
+                            //if the client trying to connect is the owner? => reject
                             System.out.println(" ==> Connection refused. Arm is busy");
                         }
                     } else {
@@ -337,7 +338,7 @@ public class MqttService {
         Point result = null;
         Gson gson = new Gson();
         String contentStr = message.toString();
-        JsonElement content = gson.fromJson(contentStr, JsonElement.class).getAsJsonObject().get("content");
+        JsonElement content = gson.fromJson(contentStr, JsonElement.class).getAsJsonObject().get("point");
 
         try {
             result = gson.fromJson(content, Point.class);
@@ -352,7 +353,7 @@ public class MqttService {
         Trajectory result = null;
         Gson gson = new Gson();
         String contentStr = message.toString();
-        JsonElement content = gson.fromJson(contentStr, JsonElement.class).getAsJsonObject().get("content");
+        JsonElement content = gson.fromJson(contentStr, JsonElement.class).getAsJsonObject().get("trajectory");
 
         try {
             result = gson.fromJson(content, Trajectory.class);
@@ -399,13 +400,14 @@ public class MqttService {
             }
 
             private void moveToPointAndPublish(Point point) throws MqttPersistenceException, MqttException {
-                System.out.print("Moving arm to point " + point);
+                System.out.print("Arm requested to move to point " + point);
                 try {
                     Thread.sleep(1000);
                     System.out.println(" ==> arm moved. Notifying clients about the last point");
                     MovedObject output = new MovedObject();
                     output.setClient(owner);
                     output.setErrorState(errorState);
+                    point.getCoordinates().set(0, point.getCoordinates().get(0)+ 0.015);
                     output.setContent(point);
                     this.publish(Constants.CONTROLLER_NAME + "/" + Constants.MOVED, output, 0, false);
                 } catch (InterruptedException ex) {

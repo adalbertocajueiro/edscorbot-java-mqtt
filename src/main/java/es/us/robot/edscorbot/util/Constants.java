@@ -28,6 +28,7 @@ public class Constants {
     public static final String clientIdSub = CONTROLLER_NAME + "_SUB";
     public static final String clientIdPub = CONTROLLER_NAME + "_PUB";
     public static final String hostname = "localhost";
+    // public static final String hostname = "192.168.64.3";
     public static final int port = 1883;
 
     // metainfo constants
