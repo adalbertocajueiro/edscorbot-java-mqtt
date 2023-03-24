@@ -235,10 +235,10 @@ components:
           $ref: '#/components/schemas/Client'
         error:
           $ref: '#/components/schemas/ErrorState'
-        content:
-          oneOf:
-            - $ref: '#/components/schemas/Point'
-            - $ref: '#/components/schemas/Trajectory'
+        point:
+          $ref: '#/components/schemas/Point'
+        trajectory:
+          $ref: '#/components/schemas/Trajectory'
     MovedObject:
       type: object
       description: The object to be communicated though channel `moved`. It contains one point, the error state and the client (owner)
