@@ -139,7 +139,7 @@ channels:
           $ref: '#/components/schemas/MovedObject'
     subscribe:
       summary: CLIENTS are subscribers
-      operationId: trajectoryPointRec
+      operationId: movedSub
       message:
         payload:
           $ref: '#/components/schemas/MovedObject'
