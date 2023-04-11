@@ -407,7 +407,7 @@ public class MqttService {
                     MovedObject output = new MovedObject();
                     output.setClient(owner);
                     output.setErrorState(errorState);
-                    point.getCoordinates().set(0, point.getCoordinates().get(0)+ 0.015);
+                    point.getCoordinates().set(0, point.getCoordinates().get(0));
                     output.setContent(point);
                     this.publish(Constants.CONTROLLER_NAME + "/" + Constants.MOVED, output, 0, false);
                 } catch (InterruptedException ex) {
